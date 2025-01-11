@@ -9,5 +9,6 @@ wheels/
 # Virtual environments
 .venv
 outputs/*
+!outputs/.gitkeep
 inputs/*
 !inputs/project_details_example.csv
