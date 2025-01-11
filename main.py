@@ -286,7 +286,7 @@ def write_final_markdown_report(merged_df: pd.DataFrame, output_dir: str = "outp
 
     with open(output_file, 'w') as file:
         human_today_str = datetime.now().strftime('%d %B %Y')
-        file.write(f"# COSE IT Applications Status Report - {human_today_str}\n\n")
+        file.write(f"# IT Applications Status Report - {human_today_str}\n\n")
         file.write(f"- Current Laravel Version: {current_laravel_version} (yearly update ~February)\n")
         file.write(f"- Current PHP Version: {current_php_version} (yearly update ~November)\n\n")
         file.write(f"## Project Status\n\n")
