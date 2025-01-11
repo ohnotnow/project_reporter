@@ -9,25 +9,6 @@ from datetime import datetime
 current_laravel_version = "11.0"
 current_php_version = "8.4"
 
-projects = [
-    "rdpinfo",
-    "demonstrators",
-    "vmstats-laravel",
-    "cronmon_github",
-    "jwnc-laravel",
-    "wikibot",
-    "risk-assessments",
-    "examdb",
-    "labmon2",
-    "student-assessments",
-    "tier4-laravel",
-    "buildstatus",
-    "qr-to-teams",
-    "teaching-office",
-    "facilities",
-    "glasgow_projects",
-]
-
 def parse_arguments():
     """
     Parses command-line arguments.
@@ -151,7 +132,7 @@ def extract_laravel_version_from_branch(branch_name):
             return None
     return None
 
-def extract_versions(base_path, perform_pull):
+def extract_versions(base_path, perform_pull, projects):
     data = []
 
     for entry in os.scandir(base_path):
@@ -322,12 +303,14 @@ if __name__ == "__main__":
     perform_pull = args.pull  # Boolean flag
     # Read manual CSV data
     manual_df = read_manual_csv(manual_csv_path)
+    # extract the 'Local Directory' column as an array called 'projects'
+    projects = manual_df['Local Directory'].tolist()
 
     # Sanity check against the list of projects at the top of this script
     validate_projects_in_manual_csv(projects, manual_df)
 
     # Extract dynamic data
-    extracted_data = extract_versions(base_path, perform_pull)
+    extracted_data = extract_versions(base_path, perform_pull, projects)
     dynamic_df = dynamic_data_to_dataframe(extracted_data)
 
     # Merge both DataFrames on 'Local Directory'
