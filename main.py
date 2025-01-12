@@ -68,6 +68,11 @@ def add_new_project_to_manual_json(json_path: str) -> None:
     data.append({
         "Local Directory": local_dir,
         "Project Name": project_name,
+        "Laravel": "_",
+        "PHP": "_",
+        "Upgrade Branch": "_",
+        "Flux?": "N",
+        "Notes": "",
         "Audience": audience,
         "Busy times": busy_times,
         "External User Access?": external_user_access,
