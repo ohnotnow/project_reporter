@@ -1,0 +1,16 @@
+[
+    {
+        "Local Directory":"myapp",
+        "Project Name":"MyApp",
+        "Laravel":"_",
+        "PHP":"_",
+        "Upgrade Branch":"_",
+        "Flux?":"N",
+        "Notes":"This is a test project",
+        "Audience":"Everyone in the world",
+        "Busy times":"All year",
+        "External User Access?":"Yes - external auditors",
+        "Criticallity":"High",
+        "Workaround":"Emails/spreadsheets?"
+    }
+]

@@ -11,4 +11,4 @@ wheels/
 outputs/*
 !outputs/.gitkeep
 inputs/*
-!inputs/project_details_example.csv
+!inputs/examaple_project_details.json

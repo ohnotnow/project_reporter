@@ -10,7 +10,7 @@ GitHub: [ohnotnow/project_reporter](https://github.com/ohnotnow/project_reporter
 
 - Scans project directories for Laravel and PHP versions.
 - Identifies available upgrade branches.
-- Merges dynamic project data with manual CSV input.
+- Merges dynamic project data with manually maintained JSON records.
 - Outputs reports in both CSV and Markdown formats.
 
 ## Installation
@@ -29,7 +29,7 @@ uv sync
 
 1. **Prepare Input CSV**
    - Navigate to the `inputs` folder.
-   - Rename `project_details_example.csv` to `project_details.csv`.
+   - Rename `examaple_project_details.json` to `project_details.json`.
    - Edit the file to reflect your project details.
 
 2. **Generate Report**
@@ -43,7 +43,7 @@ uv run main.py
 
 - `--pull`: Perform `git pull` before retrieving branches.
 - `--base-path <path>`: Specify the base directory for project search (default: current directory).
-- `--manual-csv <path>`: Path to the manual CSV file (default: `inputs/project_details.csv`).
+- `--manual-json <path>`: Path to the manual JSON file (default: `inputs/project_details.json`).
 - `--output-dir <path>`: Directory to save the output report (default: `outputs`).
 
 ### Example

@@ -3,8 +3,9 @@ import re
 import sys
 import subprocess
 import argparse
-import pandas as pd
 from datetime import datetime
+import pandas as pd
+#from markdown_pdf import MarkdownPdf, Section
 
 current_laravel_version = "11.0"
 current_php_version = "8.4"
@@ -31,10 +32,10 @@ def parse_arguments():
         help="Base directory to search for projects."
     )
     parser.add_argument(
-        "--manual-csv",
+        "--manual-json",
         type=str,
-        default="inputs/project_details.csv",
-        help="Path to the manual CSV file."
+        default="inputs/project_details.json",
+        help="Path to the manual JSON file."
     )
     parser.add_argument(
         "--output-dir",
@@ -45,13 +46,13 @@ def parse_arguments():
 
     return parser.parse_args()
 
-def validate_projects_in_manual_csv(projects, manual_df):
+def validate_projects_in_manual_json(projects, manual_df):
     """
-    Validates that all known projects are present in the manual CSV's 'Local Directory' column.
+    Validates that all known projects are present in the manual JSON's 'Local Directory' column.
 
     Args:
         projects (list): List of known project directory names.
-        manual_df (pd.DataFrame): DataFrame containing the manual CSV data.
+        manual_df (pd.DataFrame): DataFrame containing the manual JSON data.
 
     Raises:
         SystemExit: Exits the script if any project is missing.
@@ -63,13 +64,13 @@ def validate_projects_in_manual_csv(projects, manual_df):
     missing_projects = [project for project in projects if project not in manual_projects_set]
 
     if missing_projects:
-        print("**Warning:** The following known projects are missing in the manual CSV file:")
+        print("**Warning:** The following known projects are missing in the manual JSON file:")
         for project in missing_projects:
             print(f" - {project}")
-        print("\nPlease update the manual CSV file to include all known projects before proceeding.")
+        print("\nPlease update the manual JSON file to include all known projects before proceeding.")
         sys.exit(1)  # Exit the script with a non-zero status to indicate an error
     else:
-        print("✅ All known projects are present in the manual CSV file.")
+        print("✅ All known projects are present in the manual JSON file.")
 
 
 def get_git_branches(project_path, pull=False):
@@ -201,12 +202,12 @@ def dynamic_data_to_dataframe(dynamic_data):
     dynamic_df = pd.DataFrame(dynamic_data)
     return dynamic_df
 
-def read_manual_csv(manual_csv_path):
+def read_manual_json(manual_json_path):
     try:
-        manual_df = pd.read_csv(manual_csv_path, index_col=False)
+        manual_df = pd.read_json(manual_json_path)
         return manual_df
     except Exception as e:
-        print(f"Error reading manual CSV file: {e}")
+        print(f"Error reading manual JSON file: {e}")
         return pd.DataFrame()
 
 def merge_dataframes(manual_df, dynamic_df):
@@ -278,36 +279,44 @@ def save_merged_csv(merged_df, output_dir="outputs"):
     except Exception as e:
         print(f"Error saving the merged CSV file: {e}")
 
-def write_final_markdown_report(merged_df: pd.DataFrame, output_dir: str = "outputs"):
+def write_final_text_reports(merged_df: pd.DataFrame, output_dir: str = "outputs"):
     os.makedirs(output_dir, exist_ok=True)
 
     today_str = datetime.now().strftime('%Y-%m-%d')
-    output_file = os.path.join(output_dir, f"{today_str}_report.md")
+    markdown_output_file = os.path.join(output_dir, f"{today_str}_report.md")
+    pdf_output_file = os.path.join(output_dir, f"{today_str}_report.pdf")
+    human_today_str = datetime.now().strftime('%d %B %Y')
+    markdown_text = f"# IT Applications Status Report - {human_today_str}\n\n"
+    markdown_text += f"- Current Laravel Version: {current_laravel_version} (yearly update ~February)\n"
+    markdown_text += f"- Current PHP Version: {current_php_version} (yearly update ~November)\n\n"
+    markdown_text += f"## Project Status\n\n"
+    markdown_text += merged_df.to_markdown(index=False)
 
-    with open(output_file, 'w') as file:
-        human_today_str = datetime.now().strftime('%d %B %Y')
-        file.write(f"# IT Applications Status Report - {human_today_str}\n\n")
-        file.write(f"- Current Laravel Version: {current_laravel_version} (yearly update ~February)\n")
-        file.write(f"- Current PHP Version: {current_php_version} (yearly update ~November)\n\n")
-        file.write(f"## Project Status\n\n")
-        file.write(merged_df.to_markdown(index=False))
+    with open(markdown_output_file, 'w') as file:
+        file.write(markdown_text)
 
-    print(f"Report generated and saved to {output_file}")
+    #pdf = MarkdownPdf()
+    #pdf.add_section(Section(markdown_text, toc=False))
+    #pdf.meta['Title'] = f"IT Applications Status Report - {human_today_str}"
+    #pdf.meta["author"] = "COSE IT"
+    #pdf.save(pdf_output_file)
+
+    print(f"Report generated and saved to {pdf_output_file} and {markdown_output_file}")
 
 if __name__ == "__main__":
     args = parse_arguments()
 
     base_path = args.base_path
-    manual_csv_path = args.manual_csv
+    manual_json_path = args.manual_json
     output_dir = args.output_dir
     perform_pull = args.pull  # Boolean flag
     # Read manual CSV data
-    manual_df = read_manual_csv(manual_csv_path)
+    manual_df = read_manual_json(manual_json_path)
     # extract the 'Local Directory' column as an array called 'projects'
     projects = manual_df['Local Directory'].tolist()
 
     # Sanity check against the list of projects at the top of this script
-    validate_projects_in_manual_csv(projects, manual_df)
+    validate_projects_in_manual_json(projects, manual_df)
 
     # Extract dynamic data
     extracted_data = extract_versions(base_path, perform_pull, projects)
@@ -324,4 +333,4 @@ if __name__ == "__main__":
 
     # Save the merged report to a new CSV and markdown file
     save_merged_csv(final_report_df, output_dir)
-    write_final_markdown_report(final_report_df, output_dir)
+    write_final_text_reports(final_report_df, output_dir)
