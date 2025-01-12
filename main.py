@@ -1,4 +1,5 @@
 import os
+import json
 import re
 import sys
 import subprocess
@@ -44,7 +45,39 @@ def parse_arguments():
         help="Directory to save the output report."
     )
 
+    parser.add_argument(
+        "--add-new",
+        action="store_true",
+        help="If set, add a new project to the local JSON file and exit."
+    )
+
     return parser.parse_args()
+
+def add_new_project_to_manual_json(json_path: str) -> None:
+    with open(json_path, 'r') as file:
+        data = json.load(file)
+
+    local_dir = input("Enter the local directory of the new project: ")
+    project_name = input("Enter the project name: ")
+    audience = input("Enter the audience: ")
+    busy_times = input("Enter the busy times: ")
+    external_user_access = input("Enter the external user access: ")
+    criticallity = input("Enter the criticallity: ")
+    workaround = input("Enter the workaround: ")
+
+    data.append({
+        "Local Directory": local_dir,
+        "Project Name": project_name,
+        "Audience": audience,
+        "Busy times": busy_times,
+        "External User Access?": external_user_access,
+        "Criticallity": criticallity,
+        "Workaround": workaround
+    })
+
+    with open(json_path, 'w') as file:
+        json.dump(data, file, indent=4)
+
 
 def validate_projects_in_manual_json(projects, manual_df):
     """
@@ -310,6 +343,11 @@ if __name__ == "__main__":
     manual_json_path = args.manual_json
     output_dir = args.output_dir
     perform_pull = args.pull  # Boolean flag
+
+    if args.add_new:
+        add_new_project_to_manual_json(manual_json_path)
+        print(f"New project added to {manual_json_path}. Exiting...")
+        sys.exit(0)
     # Read manual CSV data
     manual_df = read_manual_json(manual_json_path)
     # extract the 'Local Directory' column as an array called 'projects'

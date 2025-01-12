@@ -45,6 +45,7 @@ uv run main.py
 - `--base-path <path>`: Specify the base directory for project search (default: current directory).
 - `--manual-json <path>`: Path to the manual JSON file (default: `inputs/project_details.json`).
 - `--output-dir <path>`: Directory to save the output report (default: `outputs`).
+- `--add-new`: Add a new project to the manual JSON file and exit.
 
 ### Example
 ```bash
